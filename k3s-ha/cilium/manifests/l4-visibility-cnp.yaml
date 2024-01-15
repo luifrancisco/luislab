@@ -1,0 +1,15 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "l4-visibility"
+spec:
+  endpointSelector:
+    matchLabels:
+      "k8s:io.kubernetes.pod.namespace": default
+      app.kubernetes.io/component: mongodb
+      app.kubernetes.io/instance: open5gs
+  ingress:
+  - toPorts:
+    - ports:
+      - port: "27017"
+        protocol: TCP
