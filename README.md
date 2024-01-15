@@ -129,4 +129,7 @@ Installation of k3s-ha ends here. At this point you should have a fully working 
 
 ### Misc
 
-- To access the Longhorn UI with port-forwarding, execute: kubectl 
+- To access the Longhorn UI with port-forwarding, execute: `kubectl -n longhorn-system port-forward deployment/longhorn-ui 8000:8000`. Access with `http://localhost:8000` in your browser.
+
+### Future plans
+- Remove kube-vip and use HA proxy instead.
