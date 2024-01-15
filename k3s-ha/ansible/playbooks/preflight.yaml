@@ -92,6 +92,8 @@
         path: /etc/cloud/cloud.cfg
         regexp: ' - update_etc_hosts'
         replace: '# - update_etc_hosts'
+
+# Change user name here
 - name: Create 'luis' user and group.
   hosts: all
   become: true
@@ -113,8 +115,7 @@
         state: present
         key: '{{ item }}'
       with_file:
-        - authorized_keys/luis-daikanyama.pub
-        - authorized_keys/luis-popos.pub
+        - authorized_keys/mypublicsshkey.pub
 
 - name: reboot VMs
   hosts: all

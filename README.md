@@ -39,16 +39,16 @@ chmod u+x create-ubuntu-2204-cloud-init-pve4-local-lvm.sh
 5. Go to k3s-ha/terraform/terraform.tfvars and modify the token.
 
 Following environment variables need to be set:
-
+```
 export TF_VAR_env_ssh_key='["your_ssh_key_here"]'
 export TF_VAR_ciuser = "your_cloudinit_user_here"
 export TF_VAR_cipassword = "your_cloudinit_pw_here"
 export TF_VAR_pm_api_token_id = "terraform-prov@pve!terraform-prov-token"
 export TF_VAR_pm_api_token_secret = "2c9f7a40-1111-1111-1111-lfb25cf66583"
 export TF_VAR_pm_api_token_idsecret = "your_api_token_id_here=your_api_secret_here"
-
-e.g.
-*export TF_VAR_pm_api_token_idsecret = "terraform-prov@pve!terraform-prov-token=2c9f7a40-1111-1111-1111-lfb25cf66583"*
+# e.g.
+# export TF_VAR_pm_api_token_idsecret = "terraform-prov@pve!terraform-prov-token=2c9f7a40-1111-1111-1111-lfb25cf66583"
+```
 
 6. Modify main.tf and change the following:
 `provider`
@@ -89,7 +89,7 @@ As an alternative step you can also execute: `pveum user add terraform-prov@pve 
 
 ### Prepare Ansible
 
-1. Modify ansible inventory in ~/k3s-ha/ansible/playbooks
+13. Modify ansible inventory in ~/k3s-ha/ansible/playbooks
 ```
 all:
   hosts:
@@ -113,5 +113,20 @@ all:
     _k8sInitialMasterHostname: stg-k8s-master-1
 ```
 
-2. Modify preflight yaml /etc/hosts configuration to reflect expected hostname and IP address.
+14. Modify preflight yaml /etc/hosts configuration to reflect expected hostname and IP address.
+15. Upload your public ssh key to k3s-ha/ansible/playbooks/authorized_keys/mypublicsshkey.pub
 
+### Execution
+
+15. Go to `k3s-ha/terraform` and execute `terraform apply`
+16. Go to `k3s-ha/ansible/playbooks` and execute the `ansible-playbook -i inventory.yaml preflight.yaml`. Note that this will take time since it will upgrade the kernel version to 6.x which is required to have sctp working properly with Cilium.
+
+17. After reboot execute `ansible-playbooks -i inventory k3s-kubevip-helm-ciliumInstallHelmCli.yaml`. As the name suggests this will install k3s, kube-vip, helm, and cilium on all nodes.
+
+18. Execute `ansible-playbooks -i inventory longhorn-install-default-path.yaml` to install longhorn and use the default path of `/var/lib/longhorn`.
+
+Installation of k3s-ha ends here. At this point you should have a fully working highly available k3s cluster with embedded etcd with Cilium as the CNI and Longhorn as your persistent storage backend.
+
+### Misc
+
+- To access the Longhorn UI with port-forwarding, execute: kubectl 
